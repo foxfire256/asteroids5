@@ -12,6 +12,7 @@
 #include "main_observer.hpp"
 #include "events/console_writer.hpp"
 #include "sdl_message_handler.hpp"
+#include "gcore/world.hpp"
 
 int main(int argc, char ** argv)
 {
@@ -20,6 +21,7 @@ int main(int argc, char ** argv)
 	events::console_writer *ecw = nullptr;
 	sdl_message_handler *smh = nullptr;
 	gfx *g = nullptr;
+	world *w = nullptr;
 
 	int done;
 	int win_w, win_h;
@@ -106,6 +108,9 @@ int main(int argc, char ** argv)
 	g = new gfx(em);
 	g->init(win_w, win_h, data_root);
 	smh = new sdl_message_handler(em);
+
+	w = new world(em, data_root);
+	
 	fflush(stdout);
 
 	// main loop
@@ -121,6 +126,7 @@ int main(int argc, char ** argv)
 	delete smh;
 	delete g;
 	//delete sp;
+	delete w;
 	delete mo;
 	delete ecw;
 	delete em;

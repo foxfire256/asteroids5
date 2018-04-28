@@ -195,6 +195,8 @@ set(COMMON_FOX_SOURCE
 )
 
 set(GCORE_SOURCE
+	gcore/world.hpp
+	gcore/world.cpp
 )
 
 # static libraries don't work so well on Apple for some reason
@@ -209,10 +211,10 @@ add_library(common_fox ${LIBRARY_TYPE} ${COMMON_FOX_SOURCE})
 target_link_libraries(common_fox ${LIBS})
 #add_library(sound ${LIBRARY_TYPE} ${SOUND_SOURCE})
 #target_link_libraries(sound ${LIBS} ${SDL_LIBS} ${SOUND_LIBS} common_events)
-#add_library(gcore ${LIBRARY_TYPE} ${GCORE_SOURCE})
-#target_link_libraries(gcore ${LIBS} ${BOOST_LIBS})
+add_library(gcore ${LIBRARY_TYPE} ${GCORE_SOURCE})
+target_link_libraries(gcore ${LIBS} ${BOOST_LIBS})
 add_executable(${PROJECT_NAME} ${MAIN_SOURCE})
-target_link_libraries(${PROJECT_NAME} ${LIBS} ${SDL_LIBS} common_fox common_events)
+target_link_libraries(${PROJECT_NAME} ${LIBS} ${SDL_LIBS} common_fox common_events gcore)
 
 MESSAGE( STATUS "MINGW: " ${MINGW} )
 MESSAGE( STATUS "MSYS: " ${MSYS} )
