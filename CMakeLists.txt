@@ -161,8 +161,40 @@ set(MAIN_SOURCE
 	main.cpp
 	gfx/gfx.hpp
 	gfx/gfx.cpp
+	main_observer.hpp
+	main_observer.cpp
+	sdl_message_handler.hpp
+	sdl_message_handler.cpp
+)
+
+set(COMMON_EVENTS_SOURCE
+	../common-cpp/events/console_writer.hpp
+	../common-cpp/events/console_writer.cpp
+	../common-cpp/events/message_base.hpp
+	../common-cpp/events/message_info.hpp
+	../common-cpp/events/message_error.hpp
+	../common-cpp/events/manager_interface.hpp
+	../common-cpp/events/manager.hpp
+	../common-cpp/events/manager.cpp
+	../common-cpp/events/message_framerate.hpp
+	../common-cpp/events/message_keydown.hpp
+	../common-cpp/events/message_keyup.hpp
+	../common-cpp/events/message_mousebutton.hpp
+	../common-cpp/events/message_mousemotion.hpp
+	../common-cpp/events/message_mousewheel.hpp
+	../common-cpp/events/message_resize.hpp
+	../common-cpp/events/observer.hpp
+	../common-cpp/events/observer.cpp
+	../common-cpp/events/subject.hpp
+	../common-cpp/events/subject.cpp
+)
+
+set(COMMON_FOX_SOURCE
 	../common-cpp/fox/counter.hpp
 	../common-cpp/fox/counter.cpp
+)
+
+set(GCORE_SOURCE
 )
 
 # static libraries don't work so well on Apple for some reason
@@ -172,9 +204,15 @@ else(APPLE)
 	set(LIBRARY_TYPE STATIC)
 endif(APPLE)
 
-add_executable(${PROJECT_NAME}
-	${MAIN_SOURCE})
-target_link_libraries(${PROJECT_NAME} ${LIBS} ${SDL_LIBS})
+add_library(common_events ${LIBRARY_TYPE} ${COMMON_EVENTS_SOURCE})
+add_library(common_fox ${LIBRARY_TYPE} ${COMMON_FOX_SOURCE})
+target_link_libraries(common_fox ${LIBS})
+#add_library(sound ${LIBRARY_TYPE} ${SOUND_SOURCE})
+#target_link_libraries(sound ${LIBS} ${SDL_LIBS} ${SOUND_LIBS} common_events)
+#add_library(gcore ${LIBRARY_TYPE} ${GCORE_SOURCE})
+#target_link_libraries(gcore ${LIBS} ${BOOST_LIBS})
+add_executable(${PROJECT_NAME} ${MAIN_SOURCE})
+target_link_libraries(${PROJECT_NAME} ${LIBS} ${SDL_LIBS} common_fox common_events)
 
 MESSAGE( STATUS "MINGW: " ${MINGW} )
 MESSAGE( STATUS "MSYS: " ${MSYS} )

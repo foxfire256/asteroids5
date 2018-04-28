@@ -8,24 +8,18 @@
 
 #include "fox/counter.hpp"
 
-#if defined(__ANDROID__)
-std::string data_root = "/sdcard/asteroids5";
-#elif defined(__APPLE__)
-std::string data_root = "/Users/foxfire/dev/asteroids5";
-#elif defined(_WIN32) || defined(WIN32) || defined(_WIN64) || defined(WIN64)
-std::string data_root = "C:/dev/asteroids5";
-#else // Linux
-std::string data_root = "/home/foxfire/dev/asteroids5";
-#endif
-
 //------------------------------------------------------------------------------
-gfx::gfx()
+gfx::gfx(events::manager_interface *emi) : events::observer(emi)
 {
+	renderer = nullptr;
+	window = nullptr;
 }
 
 //------------------------------------------------------------------------------
 gfx::~gfx()
 {
+	emi->unsubscribe_all(this);
+	
 	if(renderer != nullptr)
 		SDL_DestroyRenderer(renderer);
 	if(window != nullptr)
@@ -49,24 +43,24 @@ void gfx::render()
 //------------------------------------------------------------------------------
 void gfx::resize(int w, int h)
 {
-	this->win_w = w;
-	this->win_h = h;
+	win_w = w;
+	win_h = h;
 }
 
 //------------------------------------------------------------------------------
-void gfx::init()
+void gfx::init(int w, int h, const std::string &data_root)
 {
 	std::string window_name = "Asteroids 5";
-	int win_w = 768;
-	int win_h = 768;
+	win_w = w;
+	win_h = h;
+	this->data_root = data_root;
 
 	fps_counter = new fox::counter();
 	frames = 0;
 	framerate = 0;
 	fps_time = 0.0f;
 	
-	int ret;
-	ret = SDL_InitSubSystem(SDL_INIT_VIDEO);
+	int ret = SDL_InitSubSystem(SDL_INIT_VIDEO);
 	if(ret < 0)
 	{
 		printf("Unable to init SDL Video: %s\n", SDL_GetError());
