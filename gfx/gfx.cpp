@@ -7,19 +7,24 @@
 #include <boost/range/iterator_range.hpp>
 
 #include "fox/counter.hpp"
+#include "fox/gfx/font_factory.hpp"
+#include "fox/gfx/font_texture.hpp"
 
 //------------------------------------------------------------------------------
 gfx::gfx(events::manager_interface *emi) : events::observer(emi)
 {
 	renderer = nullptr;
 	window = nullptr;
+	ff = nullptr;
 }
 
 //------------------------------------------------------------------------------
 gfx::~gfx()
 {
 	emi->unsubscribe_all(this);
-	
+
+	delete ff;
+
 	if(renderer != nullptr)
 		SDL_DestroyRenderer(renderer);
 	if(window != nullptr)
@@ -33,10 +38,12 @@ void gfx::render()
 {
 	SDL_RenderClear(renderer);
 
-	frames++;
+	ft16->printf_xy(renderer, 4, 20, "This is a test...");
+	ft24->printf_xy(renderer, 4, 50, "Another test.");
 
 	SDL_RenderPresent(renderer);
 
+	frames++;
 	update_fps();
 }
 
@@ -177,6 +184,16 @@ void gfx::init(int w, int h, const std::string &data_root)
 	
 	// linear texture interpolation
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+
+	ff = new fox::gfx::font_factory(renderer, data_root);
+	ff->load_config();
+	ff->load();
+	ff->create_textures();
+	ff->unload_font_files();
+	std::cout << ff->get_sdl2_ttf_compiled_version() << std::endl;
+	std::cout << ff->get_sdl2_ttf_linked_version() << std::endl;
+	ft16 = ff->get_font_texture("default16");
+	ft24 = ff->get_font_texture("default24");
 }
 
 //------------------------------------------------------------------------------

@@ -31,13 +31,13 @@ int main(int argc, char ** argv)
 	win_h = 1024;
 
 #if defined(__ANDROID__)
-	std::string data_root = "/sdcard/asteroids5";
+	std::string data_root = "/sdcard/asteroids5-data";
 #elif defined(__APPLE__)
-	std::string data_root = "/Users/foxfire/dev/asteroids5";
+	std::string data_root = "/Users/foxfire/dev/asteroids5-data";
 #elif defined(_WIN32) || defined(WIN32) || defined(_WIN64) || defined(WIN64)
-	std::string data_root = "C:/dev/asteroids5";
+	std::string data_root = "C:/dev/asteroids5-data";
 #else // Linux
-	std::string data_root = "/home/foxfire/dev/asteroids5";
+	std::string data_root = "/home/foxfire/dev/asteroids5-data";
 #endif
 
 	std::cout << "Using Boost "

@@ -9,6 +9,11 @@
 namespace fox
 {
 class counter;
+namespace gfx
+{
+class font_factory;
+class font_texture;
+}
 }
 
 class gfx : public events::observer
@@ -45,6 +50,10 @@ private:
 	* @brief Root directory to load data from
 	*/
 	std::string data_root;
+
+	fox::gfx::font_factory *ff;
+	fox::gfx::font_texture *ft16;
+	fox::gfx::font_texture *ft24;
 
 	unsigned int framerate;
 	fox::counter *fps_counter;
