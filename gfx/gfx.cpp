@@ -9,6 +9,7 @@
 #include "fox/counter.hpp"
 #include "fox/gfx/font_factory.hpp"
 #include "fox/gfx/font_texture.hpp"
+#include "fox/gfx/texture_factory.hpp"
 
 //------------------------------------------------------------------------------
 gfx::gfx(events::manager_interface *emi) : events::observer(emi)
@@ -16,6 +17,7 @@ gfx::gfx(events::manager_interface *emi) : events::observer(emi)
 	renderer = nullptr;
 	window = nullptr;
 	ff = nullptr;
+	tf = nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -24,6 +26,7 @@ gfx::~gfx()
 	emi->unsubscribe_all(this);
 
 	delete ff;
+	delete tf;
 
 	if(renderer != nullptr)
 		SDL_DestroyRenderer(renderer);
@@ -194,6 +197,9 @@ void gfx::init(int w, int h, const std::string &data_root)
 	std::cout << ff->get_sdl2_ttf_linked_version() << std::endl;
 	ft16 = ff->get_font_texture("default16");
 	ft24 = ff->get_font_texture("default24");
+
+	tf = new fox::gfx::texture_factory(renderer, data_root);
+	// TODO: load texture config
 }
 
 //------------------------------------------------------------------------------

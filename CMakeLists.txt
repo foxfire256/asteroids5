@@ -32,9 +32,12 @@ if(MSVC)
 	set(SDL_LIBS ${SDL_LIBS}
 		optimized "C:\\vclibs\\vclibs\\lib\\SDL2.lib"
 		debug "C:\\vclibs\\vclibs\\lib\\SDL2d.lib")
-	set(FONT_LIBS
+	set(GFX_LIBS
 		optimized "C:\\vclibs\\vclibs\\lib\\SDL2_ttf.lib"
 		debug "C:\\vclibs\\vclibs\\lib\\SDL2_ttfd.lib")
+	set(GFX_LIBS ${GFX_LIBS}
+		optimized "C:\\vclibs\\vclibs\\lib\\SDL2_image.lib"
+		debug "C:\\vclibs\\vclibs\\lib\\SDL2_imaged.lib")
 	
 	set(BOOST_LIBS ${BOOST_LIBS}
 		optimized "C:\\vclibs\\vclibs\\lib\\libboost_program_options-vc141-mt-x64-1_66.lib"
@@ -67,7 +70,7 @@ if(MINGW OR MSYS)
 	set(SDL_LIBS
 		${SDL2_LIBRARIES}
 		)
-	set(FONT_LIBS -lSDL2_ttf)
+	set(GFX_LIBS -lSDL2_ttf -lSDL2_image)
 	
 	include_directories("c:/msys64/mingw64/include/eigen3")
 endif(MINGW OR MSYS)
@@ -92,7 +95,7 @@ if(APPLE)
 	set(SDL_LIBS
 		${SDL2_LIBRARIES}
 		)
-	set(FONT_LIBS -lSDL2_ttf)
+	set(GFX_LIBS -lSDL2_ttf -lSDL2_image)
 	
 	include_directories("/usr/local/include")
 	include_directories("/usr/local/include/eigen3")
@@ -113,7 +116,7 @@ if(UNIX AND NOT APPLE)
 	set(SDL_LIBS
 		${SDL2_LIBRARIES}
 		)
-	set(FONT_LIBS -lSDL2_ttf)
+	set(GFX_LIBS -lSDL2_ttf -lSDL2_image)
 
 	set(BOOST_LIBS ${Boost_LIBRARIES})
 	set(LIBS ${LIBS} ${Boost_LIBRARIES})
@@ -209,6 +212,11 @@ set(COMMON_FOX_GFX_SOURCE
 	../common-cpp/fox/gfx/font_texture.hpp
 	../common-cpp/fox/gfx/font_texture.cpp
 	../common-cpp/fox/gfx/font_variant.hpp
+	../common-cpp/fox/gfx/texture_factory.cpp
+	../common-cpp/fox/gfx/texture_factory.hpp
+	../common-cpp/fox/gfx/texture_config.hpp
+	../common-cpp/fox/gfx/texture.cpp
+	../common-cpp/fox/gfx/texture.hpp
 )
 
 set(GCORE_SOURCE
@@ -227,7 +235,7 @@ add_library(common_events ${LIBRARY_TYPE} ${COMMON_EVENTS_SOURCE})
 add_library(common_fox ${LIBRARY_TYPE} ${COMMON_FOX_SOURCE})
 target_link_libraries(common_fox ${LIBS})
 add_library(common_fox_gfx ${LIBRARY_TYPE} ${COMMON_FOX_GFX_SOURCE})
-target_link_libraries(common_fox_gfx ${LIBS} ${SDL2_LIBS} ${FONT_LIBS})
+target_link_libraries(common_fox_gfx ${LIBS} ${SDL2_LIBS} ${GFX_LIBS})
 #add_library(sound ${LIBRARY_TYPE} ${SOUND_SOURCE})
 #target_link_libraries(sound ${LIBS} ${SDL_LIBS} ${SOUND_LIBS} common_events)
 add_library(gcore ${LIBRARY_TYPE} ${GCORE_SOURCE})

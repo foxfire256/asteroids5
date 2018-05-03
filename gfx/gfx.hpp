@@ -13,6 +13,7 @@ namespace gfx
 {
 class font_factory;
 class font_texture;
+class texture_factory;
 }
 }
 
@@ -54,6 +55,8 @@ private:
 	fox::gfx::font_factory *ff;
 	fox::gfx::font_texture *ft16;
 	fox::gfx::font_texture *ft24;
+
+	fox::gfx::texture_factory *tf;
 
 	unsigned int framerate;
 	fox::counter *fps_counter;
