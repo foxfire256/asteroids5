@@ -15,6 +15,7 @@ if(MSVC)
 	ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE)
 	ADD_DEFINITIONS(-D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
 	ADD_DEFINITIONS(-DBOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE)
+	#ADD_DEFINITIONS(-D_USE_MATH_DEFINES)
 	
 	# /Oi enable intrinsic functions
 	# /GR- disable RTTI
@@ -222,7 +223,15 @@ set(COMMON_FOX_GFX_SOURCE
 set(GCORE_SOURCE
 	gcore/world.hpp
 	gcore/world.cpp
-)
+	gcore/space_object.cpp
+	gcore/space_object.hpp
+	gcore/bullet.cpp
+	gcore/bullet.hpp
+	gcore/asteroid.cpp
+	gcore/asteroid.hpp
+	gcore/ship.cpp
+	gcore/ship.hpp
+	)
 
 # static libraries don't work so well on Apple for some reason
 if(APPLE)
@@ -235,7 +244,7 @@ add_library(common_events ${LIBRARY_TYPE} ${COMMON_EVENTS_SOURCE})
 add_library(common_fox ${LIBRARY_TYPE} ${COMMON_FOX_SOURCE})
 target_link_libraries(common_fox ${LIBS})
 add_library(common_fox_gfx ${LIBRARY_TYPE} ${COMMON_FOX_GFX_SOURCE})
-target_link_libraries(common_fox_gfx ${LIBS} ${SDL2_LIBS} ${GFX_LIBS})
+target_link_libraries(common_fox_gfx ${LIBS} ${SDL_LIBS} ${GFX_LIBS})
 #add_library(sound ${LIBRARY_TYPE} ${SOUND_SOURCE})
 #target_link_libraries(sound ${LIBS} ${SDL_LIBS} ${SOUND_LIBS} common_events)
 add_library(gcore ${LIBRARY_TYPE} ${GCORE_SOURCE})

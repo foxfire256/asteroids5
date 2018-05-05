@@ -1,3 +1,5 @@
+
+#define _USE_MATH_DEFINES
 #include <string>
 #include <iostream>
 
@@ -109,7 +111,8 @@ int main(int argc, char ** argv)
 	g->init(win_w, win_h, data_root);
 	smh = new sdl_message_handler(em);
 
-	w = new world(em, data_root);
+	w = new world(em, data_root, win_w, win_h);
+	w->init();
 	
 	fflush(stdout);
 
