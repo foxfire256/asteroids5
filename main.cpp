@@ -8,6 +8,7 @@
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 #include <boost/token_functions.hpp>
+#include <Eigen/Core>
 
 #include "gfx/gfx.hpp"
 #include "events/manager.hpp"
@@ -41,6 +42,9 @@ int main(int argc, char ** argv)
 #else // Linux
 	std::string data_root = "/home/foxfire/dev/asteroids5-data";
 #endif
+
+	printf("Eigen version: %d.%d.%d\n", EIGEN_WORLD_VERSION,
+		EIGEN_MAJOR_VERSION, EIGEN_MINOR_VERSION);
 
 	std::cout << "Using Boost "
 		// major version
@@ -100,6 +104,17 @@ int main(int argc, char ** argv)
 	// start SDL
 	SDL_Init(0);
 
+	SDL_version compiled;
+	SDL_version linked;
+
+	SDL_VERSION(&compiled);
+	SDL_GetVersion(&linked);
+	printf("SDL2 compiled version %d.%d.%d\n",
+		compiled.major, compiled.minor, compiled.patch);
+	printf("SDL2 linked version %d.%d.%d\n",
+		linked.major, linked.minor, linked.patch);
+	printf("SDL2 revision number: %d\n", SDL_GetRevisionNumber());
+
 	std::cout << "Running on platform: " << SDL_GetPlatform() << std::endl;
 	std::cout << "Number of logical CPU cores: " << SDL_GetCPUCount() << std::endl;
 	int ram_mb = SDL_GetSystemRAM();
@@ -123,6 +138,7 @@ int main(int argc, char ** argv)
 
 		em->pump_events();
 
+		w->update();
 		g->render();
 	}
 

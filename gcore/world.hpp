@@ -8,7 +8,13 @@
 #include <random>
 #include <list>
 
-class space_object;
+class ship;
+class bullet;
+class asteroid;
+namespace fox
+{
+class counter;
+}
 
 class world : public events::observer
 {
@@ -33,7 +39,8 @@ public:
 	void process_messages(events::message_base *e){}
 
 	void init();
-	void deinit();
+	
+	void update();
 
 private:
 	std::string data_root;
@@ -43,9 +50,13 @@ private:
 	*/
 	std::mt19937_64 generator;
 
-	std::list<space_object *> asteroids;
-	std::list<space_object *> bullets;
-	space_object *player_ship;
+	fox::counter *main_counter;
+
+	std::list<asteroid *> asteroids;
+	std::list<bullet *> bullets;
+	ship *player_ship;
+
+	void deinit();
 };
 
 #endif

@@ -5,6 +5,7 @@
 
 #include <Eigen/Core>
 
+#include "fox/counter.hpp"
 #include "bullet.hpp"
 #include "asteroid.hpp"
 #include "ship.hpp"
@@ -20,12 +21,28 @@ world::world(events::manager_interface *emi, const std::string &data_root,
 	this->generator = std::mt19937_64(std::random_device{}());
 
 	player_ship = nullptr;
+	main_counter = nullptr;
 }
 
 //------------------------------------------------------------------------------
 world::~world()
 {
 	deinit();
+}
+
+//------------------------------------------------------------------------------
+void world::update()
+{
+	float dt = main_counter->update();
+
+	for(asteroid *a : asteroids)
+	{
+		a->pos += dt * a->vel;
+		if(a->pos[0] > (float)width)
+			a->pos[0] -= (float)width;
+		if(a->pos[1] > (float)height)
+			a->pos[1] -= (float)height;
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -59,22 +76,25 @@ void world::init()
 		if(d.norm() > 2.0f * a->radius)
 			break;
 	}
+
+	main_counter = new fox::counter();
 }
 
 //------------------------------------------------------------------------------
 void world::deinit()
 {
-	for(space_object *so : asteroids)
+	for(asteroid *a : asteroids)
 	{
-		delete so;
+		delete a;
 	}
 	asteroids.clear();
 
-	for(space_object *so : bullets)
+	for(bullet *b : bullets)
 	{
-		delete so;
+		delete b;
 	}
 	bullets.clear();
 
 	delete player_ship;
+	delete main_counter;
 }
