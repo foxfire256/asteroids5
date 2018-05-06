@@ -42,6 +42,10 @@ public:
 	
 	void update();
 
+	std::list<asteroid *> asteroids;
+	std::list<bullet *> bullets;
+	ship *player_ship;
+
 private:
 	std::string data_root;
 	int width, height;
@@ -51,10 +55,6 @@ private:
 	std::mt19937_64 generator;
 
 	fox::counter *main_counter;
-
-	std::list<asteroid *> asteroids;
-	std::list<bullet *> bullets;
-	ship *player_ship;
 
 	void deinit();
 };

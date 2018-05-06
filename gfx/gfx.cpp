@@ -10,14 +10,28 @@
 #include "fox/gfx/font_factory.hpp"
 #include "fox/gfx/font_texture.hpp"
 #include "fox/gfx/texture_factory.hpp"
+#include "fox/gfx/texture.hpp"
+#include "gcore/world.hpp"
+#include "gcore/asteroid.hpp"
+#include "gcore/bullet.hpp"
+#include "gcore/ship.hpp"
 
 //------------------------------------------------------------------------------
-gfx::gfx(events::manager_interface *emi) : events::observer(emi)
+gfx::gfx(events::manager_interface *emi, world *w) : events::observer(emi)
 {
+	this->w = w;
+	
 	renderer = nullptr;
 	window = nullptr;
 	ff = nullptr;
 	tf = nullptr;
+
+	ft16 = nullptr;
+	ft24 = nullptr;
+
+	ship_tex = nullptr;
+	asteroid_tex = nullptr;
+	bullet_tex = nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -40,6 +54,21 @@ gfx::~gfx()
 void gfx::render()
 {
 	SDL_RenderClear(renderer);
+
+	for(asteroid *a : w->asteroids)
+	{
+		asteroid_tex->draw_centered(renderer,
+			(uint16_t)a->pos[0],
+			(uint16_t)a->pos[1],
+			(uint16_t)(a->radius * 2),
+			(uint16_t)(a->radius * 2));
+	}
+
+	ship_tex->draw_centered(renderer,
+		(uint16_t)w->player_ship->pos[0],
+		(uint16_t)w->player_ship->pos[1],
+		(uint16_t)(w->player_ship->radius * 2),
+		(uint16_t)(w->player_ship->radius * 2));
 
 	ft16->printf_xy(renderer, 4, 20, "This is a test...");
 	ft24->printf_xy(renderer, 4, 50, "Another test.");
@@ -199,7 +228,11 @@ void gfx::init(int w, int h, const std::string &data_root)
 	ft24 = ff->get_font_texture("default24");
 
 	tf = new fox::gfx::texture_factory(renderer, data_root);
-	// TODO: load texture config
+	tf->load_config();
+	tf->load();
+	ship_tex = tf->get_texture("ship");
+	asteroid_tex = tf->get_texture("asteroid");
+	bullet_tex = tf->get_texture("bullet");
 }
 
 //------------------------------------------------------------------------------

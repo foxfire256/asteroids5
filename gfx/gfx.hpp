@@ -14,13 +14,15 @@ namespace gfx
 class font_factory;
 class font_texture;
 class texture_factory;
+class texture;
 }
 }
+class world;
 
 class gfx : public events::observer
 {
 public:
-	gfx(events::manager_interface *emi);
+	gfx(events::manager_interface *emi, world *w);
 	virtual ~gfx();
 	
 	void init(int w, int h, const std::string &data_root);
@@ -51,12 +53,16 @@ private:
 	* @brief Root directory to load data from
 	*/
 	std::string data_root;
+	world *w;
 
 	fox::gfx::font_factory *ff;
 	fox::gfx::font_texture *ft16;
 	fox::gfx::font_texture *ft24;
 
 	fox::gfx::texture_factory *tf;
+	fox::gfx::texture *ship_tex;
+	fox::gfx::texture *asteroid_tex;
+	fox::gfx::texture *bullet_tex;
 
 	unsigned int framerate;
 	fox::counter *fps_counter;

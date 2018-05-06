@@ -121,13 +121,13 @@ int main(int argc, char ** argv)
 	char buffer[8];
 	snprintf(buffer, 8, "%.1f", ram_mb / 1024.0f);
 	std::cout << "System RAM " << ram_mb << "MB (" << buffer << " GB)\n";
-	
-	g = new gfx(em);
-	g->init(win_w, win_h, data_root);
-	smh = new sdl_message_handler(em);
 
 	w = new world(em, data_root, win_w, win_h);
 	w->init();
+
+	g = new gfx(em, w);
+	g->init(win_w, win_h, data_root);
+	smh = new sdl_message_handler(em);
 	
 	fflush(stdout);
 
