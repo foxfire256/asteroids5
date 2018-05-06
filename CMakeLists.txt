@@ -248,7 +248,7 @@ target_link_libraries(common_fox_gfx ${LIBS} ${SDL_LIBS} ${GFX_LIBS})
 #add_library(sound ${LIBRARY_TYPE} ${SOUND_SOURCE})
 #target_link_libraries(sound ${LIBS} ${SDL_LIBS} ${SOUND_LIBS} common_events)
 add_library(gcore ${LIBRARY_TYPE} ${GCORE_SOURCE})
-target_link_libraries(gcore ${LIBS} ${BOOST_LIBS})
+target_link_libraries(gcore ${LIBS} ${BOOST_LIBS} common_events common_fox)
 add_executable(${PROJECT_NAME} ${MAIN_SOURCE})
 target_link_libraries(${PROJECT_NAME} ${LIBS} ${SDL_LIBS} common_fox common_fox_gfx common_events gcore)
 
