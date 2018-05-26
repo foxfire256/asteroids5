@@ -37,7 +37,7 @@ void world::update()
 
 	for(asteroid *a : asteroids)
 	{
-		a->pos += dt * a->vel;
+		a->pos = a->pos + dt * a->vel;
 		if(a->pos[0] > (float)width)
 			a->pos[0] -= (float)width;
 		if(a->pos[1] > (float)height)
@@ -55,6 +55,7 @@ void world::init()
 	a->direction = dist(generator);
 	a->vel[0] = cosf(a->direction);
 	a->vel[1] = sinf(a->direction);
+	a->vel = a->vel * a->speed;
 	dist = std::uniform_real_distribution<float>(0.0f, (float)width);
 	a->pos[0] = dist(generator);
 	dist = std::uniform_real_distribution<float>(0.0f, (float)height);
