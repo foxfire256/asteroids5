@@ -8,6 +8,8 @@ project(asteroids5)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+include_directories("../common-cpp")
+
 # this assumes you are running cmake from a build directory in the source directory
 # cmake .. -G "Visual Studio 15 2017 Win64"
 if(MSVC)
@@ -16,11 +18,15 @@ if(MSVC)
 	ADD_DEFINITIONS(-D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
 	ADD_DEFINITIONS(-DBOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE)
 	#ADD_DEFINITIONS(-D_USE_MATH_DEFINES)
+	# WARNING: the following do not work with boost program_options
+	#ADD_DEFINITIONS(-DBOOST_NO_RTTI)
+	#ADD_DEFINITIONS(-DBOOST_NO_TYPEID)
 	
 	# /Oi enable intrinsic functions
-	# /GR- disable RTTI
+	# /GR- disable RTTI, can't do with boost program_options
+	# /std:c++17 or /std:c++14 are options
 	SET(CMAKE_C_FLAGS "/MP ${CMAKE_C_FLAGS}")
-	SET(CMAKE_CXX_FLAGS "/MP /std:c++latest /Oi /GR- ${CMAKE_CXX_FLAGS}")
+	SET(CMAKE_CXX_FLAGS "/MP /std:c++latest /Oi ${CMAKE_CXX_FLAGS}")
 	
 	find_package(OpenGL REQUIRED)
 	
@@ -33,10 +39,10 @@ if(MSVC)
 	set(SDL_LIBS ${SDL_LIBS}
 		optimized "C:\\vclibs\\vclibs\\lib\\SDL2.lib"
 		debug "C:\\vclibs\\vclibs\\lib\\SDL2d.lib")
-	set(GFX_LIBS
+	set(SDL_LIBS ${SDL_LIBS}
 		optimized "C:\\vclibs\\vclibs\\lib\\SDL2_ttf.lib"
 		debug "C:\\vclibs\\vclibs\\lib\\SDL2_ttfd.lib")
-	set(GFX_LIBS ${GFX_LIBS}
+	set(SDL_LIBS ${SDL_LIBS}
 		optimized "C:\\vclibs\\vclibs\\lib\\SDL2_image.lib"
 		debug "C:\\vclibs\\vclibs\\lib\\SDL2_imaged.lib")
 	
@@ -55,84 +61,48 @@ if(MSVC)
 	include_directories("C:\\vclibs\\vclibs\\include")
 endif(MSVC)
 
-if(MINGW OR MSYS)
-	set(CMAKE_PREFIX_PATH "c:/msys64/mingw64")
-	set(CMAKE_INCLUDE_PATH "c:/msys64/mingw64/include")
-	set(CMAKE_LIBRARY_PATH "c:/msys64/mingw64/lib")
+if(MINGW OR MSYS OR UNIX OR APPLE)
+	if(APPLE)
+		set(CMAKE_PREFIX_PATH "/usr/local")
+		set(CMAKE_INCLUDE_PATH "/usr/local/include")
+		set(CMAKE_LIBRARY_PATH "/usr/local/lib")
+	elseif(UNIX AND NOT APPLE)
+		set(CMAKE_PREFIX_PATH "/usr")
+		set(CMAKE_INCLUDE_PATH "/usr/include")
+		set(CMAKE_LIBRARY_PATH "/usr/lib")
+	elseif(MINGW OR MSYS)
+		set(CMAKE_PREFIX_PATH "c:/msys64/mingw64")
+		set(CMAKE_INCLUDE_PATH "c:/msys64/mingw64/include")
+		set(CMAKE_LIBRARY_PATH "c:/msys64/mingw64/lib")
+	endif(APPLE)
+	
+	if(APPLE)
+		set(LIBS ${LIBS} -L/usr/local/lib)
+	elseif(UNIX AND NOT APPLE)
+		set(LIBS ${LIBS})
+	elseif(MINGW OR MSYS)
+		set(LIBS ${LIBS} -lmingw32)
+	endif(APPLE)
 	
 	find_package(Boost COMPONENTS program_options system filesystem REQUIRED)
 	include_directories(${Boost_INCLUDE_DIRS})
-
 	set(BOOST_LIBS ${Boost_LIBRARIES})
 	
-	INCLUDE(FindPkgConfig)
-	PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
-	include_directories(${SDL2_INCLUDE_DIR})
-	set(SDL_LIBS
-		${SDL2_LIBRARIES}
-		)
-	set(GFX_LIBS -lSDL2_ttf -lSDL2_image)
+	set(SDL2_LIBS -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image)
+	set(SOUND_LIBS -lSDL2_mixer -lvorbis -logg -lz)
 	
-	include_directories("c:/msys64/mingw64/include/eigen3")
-endif(MINGW OR MSYS)
-
-if(APPLE)
-	set(CMAKE_PREFIX_PATH "/usr/local")
-	set(CMAKE_INCLUDE_PATH "/usr/local/include")
-	set(CMAKE_LIBRARY_PATH "/usr/local/lib")
-	
-	find_package(Boost COMPONENTS program_options system filesystem REQUIRED)
-	include_directories(${Boost_INCLUDE_DIRS})
-
-	set(BOOST_LIBS ${Boost_LIBRARIES})
-	set(LIBS
-		-L/usr/local/lib
-		${LIBS}
-	)
-	
-	INCLUDE(FindPkgConfig)
-	PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
-	include_directories(${SDL2_INCLUDE_DIR})
-	set(SDL_LIBS
-		${SDL2_LIBRARIES}
-		)
-	set(GFX_LIBS -lSDL2_ttf -lSDL2_image)
-	
-	include_directories("/usr/local/include")
-	include_directories("/usr/local/include/eigen3")
-endif(APPLE)
-
-# this probably only works on openSUSE Tumbleweed
-if(UNIX AND NOT APPLE)
-	set(CMAKE_PREFIX_PATH "/usr")
-	set(CMAKE_INCLUDE_PATH "/usr/include")
-	set(CMAKE_LIBRARY_PATH "/usr/lib")
-
-	find_package(Boost COMPONENTS program_options system filesystem REQUIRED)
-	include_directories(${Boost_INCLUDE_DIRS})
-	
-	INCLUDE(FindPkgConfig)
-	PKG_SEARCH_MODULE(SDL2 REQUIRED sdl2)
-	include_directories(${SDL2_INCLUDE_DIR})
-	set(SDL_LIBS
-		${SDL2_LIBRARIES}
-		)
-	set(GFX_LIBS -lSDL2_ttf -lSDL2_image)
-
-	set(BOOST_LIBS ${Boost_LIBRARIES})
-	set(LIBS ${LIBS} ${Boost_LIBRARIES})
- 
-	include_directories("/usr/include")
-	include_directories("/usr/include/eigen3")
-
-endif(UNIX AND NOT APPLE)
-
-include_directories("../common-cpp")
-
-if(NOT MSVC)
-	# --------------------------------------------------------------------------
-	# WARNING: all warnings are disabled for GCC
-	# --------------------------------------------------------------------------
+	if(APPLE)
+		include_directories("/usr/local/opt/qt/include")
+		include_directories("/usr/local/include")
+		include_directories("/usr/local/include/eigen3")
+	elseif(UNIX AND NOT APPLE)
+		include_directories("/usr/include")
+		include_directories("/usr/include/eigen3")
+	elseif(MINGW OR MSYS)
+		include_directories("c:/msys64/mingw64/include/eigen3")
+		# -mwindows makes the console box go away
+		#set(SDL2_LIBS ${SDL2_LIBS} -mwindows)
+	endif(APPLE)
 	
 	# better optimizations
 	# -O3 still IEEE754 compliant
@@ -141,31 +111,33 @@ if(NOT MSVC)
 	# -ftree-vectorize not sure how well this does
 	# -mavx
 	# -mavx2
-	set(CMAKE_C_FLAGS_RELEASE "-O3")
-	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -w")
+	set(CMAKE_C_FLAGS_RELEASE "-Ofast")
+	set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
 	
 	# force some better debugging
 	# this should be gcc
+	# WARNING: warnings are disabled
 	if(NOT APPLE)
 		set(CMAKE_C_FLAGS_DEBUG "-ggdb3 -Og")
 		set(CMAKE_CXX_FLAGS_DEBUG "-ggdb3 -Og -w")
 	endif(NOT APPLE)
 	# and this should be clang
+	# WARNING: warnings are disabled on clang
 	if(APPLE)
 		set(CMAKE_C_FLAGS_DEBUG "-O0 -g3")
-		set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3")
+		set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3 -w")
 	endif(APPLE)
 
-	# enable C11/C++14 for gcc and clang
-	set(EXTRA_CXX_FLAGS "-std=c++14 -Wno-deprecated-declarations -pipe")
-	set(EXTRA_C_FLAGS "-std=c11 -Wno-deprecated-declarations -pipe")
+	# enable C11/C++17 for gcc and clang
+	set(EXTRA_CXX_FLAGS "-std=c++17 -Wno-deprecated-declarations -pipe")
+	set(EXTRA_C_FLAGS "-std=c17 -Wno-deprecated-declarations -pipe")
 	
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_C_FLAGS}")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_CXX_FLAGS}")
 	
 	# pipe keeps compilation in memory
 	set(CMAKE_LD_FLAGS "-pipe")
-endif(NOT MSVC)
+endif(MINGW OR MSYS OR UNIX OR APPLE)
 
 set(MAIN_SOURCE
 	main.cpp
@@ -233,24 +205,13 @@ set(GCORE_SOURCE
 	gcore/ship.hpp
 	)
 
-# static libraries don't work so well on Apple for some reason
-if(APPLE)
-	set(LIBRARY_TYPE SHARED)
-else(APPLE)
-	set(LIBRARY_TYPE STATIC)
-endif(APPLE)
-
-add_library(common_events ${LIBRARY_TYPE} ${COMMON_EVENTS_SOURCE})
-add_library(common_fox ${LIBRARY_TYPE} ${COMMON_FOX_SOURCE})
-target_link_libraries(common_fox ${LIBS})
-add_library(common_fox_gfx ${LIBRARY_TYPE} ${COMMON_FOX_GFX_SOURCE})
-target_link_libraries(common_fox_gfx ${LIBS} ${SDL_LIBS} ${GFX_LIBS})
-#add_library(sound ${LIBRARY_TYPE} ${SOUND_SOURCE})
-#target_link_libraries(sound ${LIBS} ${SDL_LIBS} ${SOUND_LIBS} common_events)
-add_library(gcore ${LIBRARY_TYPE} ${GCORE_SOURCE})
-target_link_libraries(gcore ${LIBS} ${BOOST_LIBS} common_events common_fox)
-add_executable(${PROJECT_NAME} ${MAIN_SOURCE})
-target_link_libraries(${PROJECT_NAME} ${LIBS} ${SDL_LIBS} common_fox common_fox_gfx common_events gcore)
+add_executable(${PROJECT_NAME} ${MAIN_SOURCE}
+	${COMMON_EVENTS_SOURCE}
+	${COMMON_FOX_SOURCE}
+	${COMMON_FOX_GFX_SOURCE}
+	${GCORE_SOURCE}
+	)
+target_link_libraries(${PROJECT_NAME} ${LIBS} ${SDL2_LIBS} ${BOOST_LIBS})
 
 MESSAGE( STATUS "MINGW: " ${MINGW} )
 MESSAGE( STATUS "MSYS: " ${MSYS} )
